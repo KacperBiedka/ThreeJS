@@ -4,70 +4,101 @@
     <meta charset="utf-8" />
     <title>My first three.js app</title>
     <style>
+      html,
       body {
         margin: 0;
-        padding: 0;
+        height: 100%;
       }
-      canvas {
-        width: 100vw;
-        height: 100vh;
-      }
-      #info {
-        position: absolute;
-        top: 10px;
+      #c {
         width: 100%;
-        text-align: center;
-        z-index: 100;
+        height: 100%;
         display: block;
-        color: #fff;
       }
     </style>
   </head>
   <body>
-    <div id="info">Description</div>
+    <canvas id="c"></canvas>
     <script src="js/three.js"></script>
     <script>
-      var scene = new THREE.Scene();
-      var camera = new THREE.PerspectiveCamera(
-        50,
-        window.innerWidth / window.innerHeight,
-        0.1,
-        1000
-      );
+      "use strict";
 
-      camera.position.set(0, 0, 100);
-      camera.lookAt(0, 0, 0);
+      /* global THREE */
 
-      var renderer = new THREE.WebGLRenderer();
-      renderer.setSize(window.innerWidth, window.innerHeight);
-      document.body.appendChild(renderer.domElement);
+      function main() {
+        const canvas = document.querySelector("#c");
+        const renderer = new THREE.WebGLRenderer({ canvas });
 
-      var geometry = new THREE.BoxGeometry(5, 5, 5);
-      var material = new THREE.MeshBasicMaterial({ color: 0x0000ff });
-      var cube = new THREE.Mesh(geometry, material);
-      scene.add(cube);
+        const fov = 75;
+        const aspect = 2; // the canvas default
+        const near = 0.1;
+        const far = 5;
+        const camera = new THREE.PerspectiveCamera(fov, aspect, near, far);
+        camera.position.z = 2;
 
-      var lineMaterial = new THREE.LineBasicMaterial({ color: 0x0000ff });
+        const scene = new THREE.Scene();
+        {
+          const color = 0xffffff;
+          const intensity = 1;
+          const light = new THREE.DirectionalLight(color, intensity);
+          light.position.set(-1, 2, 4);
+          scene.add(light);
+        }
 
-      var lineGeometry = new THREE.Geometry();
-      lineGeometry.vertices.push(new THREE.Vector3(-20, 0, 0));
-      lineGeometry.vertices.push(new THREE.Vector3(0, 20, 0));
-      lineGeometry.vertices.push(new THREE.Vector3(20, 0, 0));
+        const boxWidth = 1;
+        const boxHeight = 1;
+        const boxDepth = 1;
+        const geometry = new THREE.BoxGeometry(boxWidth, boxHeight, boxDepth);
 
-      var line = new THREE.Line(lineGeometry, lineMaterial);
+        function makeInstance(geometry, color, x) {
+          const material = new THREE.MeshPhongMaterial({ color });
 
-      scene.add(line);
+          const cube = new THREE.Mesh(geometry, material);
+          scene.add(cube);
 
-      var animate = function() {
-        requestAnimationFrame(animate);
+          cube.position.x = x;
 
-        cube.rotation.x += 0.09;
-        cube.rotation.y += 0.09;
+          return cube;
+        }
 
-        renderer.render(scene, camera);
-      };
+        const cubes = [
+          makeInstance(geometry, 0x44aa88, 0),
+          makeInstance(geometry, 0x8844aa, -2),
+          makeInstance(geometry, 0xaa8844, 2)
+        ];
 
-      animate();
+        function resizeRendererToDisplaySize(renderer) {
+          const canvas = renderer.domElement;
+          const width = canvas.clientWidth;
+          const height = canvas.clientHeight;
+          const needResize = canvas.width !== width || canvas.height !== height;
+          if (needResize) {
+            renderer.setSize(width, height, false);
+          }
+          return needResize;
+        }
+
+        function render(time) {
+          time *= 0.001; // convert time to seconds
+          if (resizeRendererToDisplaySize(renderer)) {
+            const canvas = renderer.domElement;
+            camera.aspect = canvas.clientWidth / canvas.clientHeight;
+            camera.updateProjectionMatrix();
+          }
+          cubes.forEach((cube, ndx) => {
+            const speed = 1 + ndx * 0.1;
+            const rot = time * speed;
+            cube.rotation.x = rot;
+            cube.rotation.y = rot;
+          });
+
+          renderer.render(scene, camera);
+
+          requestAnimationFrame(render);
+        }
+        requestAnimationFrame(render);
+      }
+
+      main();
     </script>
   </body>
 </html>
