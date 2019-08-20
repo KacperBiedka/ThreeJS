@@ -2,7 +2,7 @@
 <html>
   <head>
     <meta charset="utf-8" />
-    <title>My first three.js app</title>
+    <title>Three.js</title>
     <style>
       html,
       body {
@@ -116,24 +116,35 @@
         }
 
         {
-          const skyColor = 0xb1e1ff;
-          const groundColor = 0xb97a20;
+          const color = 0xffffff;
           const intensity = 1;
-          const light = new THREE.HemisphereLight(
-            skyColor,
-            groundColor,
-            intensity
-          );
+          const light = new THREE.PointLight(color, intensity);
+          light.position.set(0, 10, 0);
           scene.add(light);
+
+          const helper = new THREE.PointLightHelper(light);
+          scene.add(helper);
+
+          function makeXYZGUI(gui, vector3, name, onChangeFn) {
+            const folder = gui.addFolder(name);
+            folder.add(vector3, "x", -10, 10).onChange(onChangeFn);
+            folder.add(vector3, "y", 0, 10).onChange(onChangeFn);
+            folder.add(vector3, "z", -10, 10).onChange(onChangeFn);
+            folder.open();
+          }
+
+          function updateLight() {
+            helper.update();
+          }
 
           const gui = new dat.GUI();
           gui
             .addColor(new ColorGUIHelper(light, "color"), "value")
-            .name("skyColor");
-          gui
-            .addColor(new ColorGUIHelper(light, "groundColor"), "value")
-            .name("groundColor");
+            .name("color");
           gui.add(light, "intensity", 0, 2, 0.01);
+          gui.add(light, "distance", 0, 40).onChange(updateLight);
+
+          makeXYZGUI(gui, light.position, "position", updateLight);
         }
 
         function resizeRendererToDisplaySize(renderer) {
