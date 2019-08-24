@@ -1,10 +1,11 @@
 "use strict";
 
-/* global THREE */
+/* global THREE, dat */
 
 function main() {
   const canvas = document.querySelector("#c");
   const renderer = new THREE.WebGLRenderer({ canvas });
+  const gui = new dat.GUI();
 
   const fov = 75;
   const aspect = 2; // the canvas default
@@ -15,12 +16,50 @@ function main() {
 
   const scene = new THREE.Scene();
 
+  // We use this class to pass to dat.gui
+  // so when it manipulates near or far
+  // near is never > far and far is never < near
+  // Also when dat.gui maniplates color we'll
+  // update both the fog and background colors.
+  class FogGUIHelper {
+    constructor(fog, backgroundColor) {
+      this.fog = fog;
+      this.backgroundColor = backgroundColor;
+    }
+    get near() {
+      return this.fog.near;
+    }
+    set near(v) {
+      this.fog.near = v;
+      this.fog.far = Math.max(this.fog.far, v);
+    }
+    get far() {
+      return this.fog.far;
+    }
+    set far(v) {
+      this.fog.far = v;
+      this.fog.near = Math.min(this.fog.near, v);
+    }
+    get color() {
+      return `#${this.fog.color.getHexString()}`;
+    }
+    set color(hexString) {
+      this.fog.color.set(hexString);
+      this.backgroundColor.set(hexString);
+    }
+  }
+
   {
     const near = 1;
     const far = 2;
     const color = "lightblue";
     scene.fog = new THREE.Fog(color, near, far);
     scene.background = new THREE.Color(color);
+
+    const fogGUIHelper = new FogGUIHelper(scene.fog, scene.background);
+    gui.add(fogGUIHelper, "near", near, far).listen();
+    gui.add(fogGUIHelper, "far", near, far).listen();
+    gui.addColor(fogGUIHelper, "color");
   }
 
   {
