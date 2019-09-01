@@ -1,8 +1,8 @@
-# Webpack Frontend Starterkit
+# Project uses Webpack Frontend Starterkit
 
 [![Greenkeeper badge](https://badges.greenkeeper.io/wbkd/webpack-starter.svg)](https://greenkeeper.io/)
 
-A lightweight foundation for your next webpack based frontend project.
+The webpack setup was copied to enable the use of ES6 and Sass along with the THREE.js library
 
 
 ### Installation
