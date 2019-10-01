@@ -43,7 +43,7 @@ function init() {
     mainCamera.position.z = 2;
     mainScene.add( mainCamera );
 
-    textGeo = new THREE.PlaneGeometry(300,300);
+    textGeo = new THREE.PlaneGeometry(300 , 300);
     THREE.ImageUtils.crossOrigin = ''; //Need this to pull in crossdomain images from AWS
     textTexture = THREE.ImageUtils.loadTexture('https://s3-us-west-2.amazonaws.com/s.cdpn.io/95637/quickText.png');
     textMaterial = new THREE.MeshLambertMaterial({color: 0x00ffff, opacity: 1, map: textTexture, transparent: true, blending: THREE.AdditiveBlending});
@@ -57,11 +57,11 @@ function init() {
 
     smokeTexture = THREE.ImageUtils.loadTexture('https://s3-us-west-2.amazonaws.com/s.cdpn.io/95637/Smoke-Element.png');
     smokeMaterial = new THREE.MeshLambertMaterial({color: 0xffffff, map: smokeTexture, transparent: true});
-    smokeGeo = new THREE.PlaneGeometry(300, 300);
+    smokeGeo = new THREE.PlaneGeometry(300,300);
     smokeParticles = [];
 
 
-    for (var p = 0; p < 25; p++) {
+    for (var p = 0; p < 150; p++) {
         var particle = new THREE.Mesh(smokeGeo,smokeMaterial);
         particle.position.set(Math.random()*500-250,Math.random()*500-250,Math.random()*1000-100);
         particle.rotation.z = Math.random() * 360;
@@ -77,7 +77,7 @@ function init() {
         mainScene.add(light);
     }
 
-    planeGeometry = new THREE.PlaneGeometry( 2, 2, 128 );
+    planeGeometry = new THREE.PlaneGeometry( 5, 5, 5 );
     const planeTexture = renderTarget.texture;
     planeMaterial = new THREE.MeshPhongMaterial( {map: planeTexture });
     plane = new THREE.Mesh( planeGeometry, planeMaterial );
@@ -114,5 +114,4 @@ function render() {
     renderer.setRenderTarget(null);
     renderer.setSize( window.innerWidth, window.innerHeight );
     renderer.render( mainScene, mainCamera );
-    requestAnimationFrame(render);
 }
