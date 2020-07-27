@@ -6,7 +6,7 @@ export default class GithubInfo {
     this.getUserInfo();
   }
   getUserInfo() {
-    fetch(`https://api.github.com/users/${this.user}`)
+    fetch(`https://api.github.com/users/${this.user}/contributions`)
       .then((response) => response.json())
       .then((data) => {
         console.log(data);
